@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+/* Webfont OpenDyslexic */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/font/OpenDyslexic-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --base-size: 15px;
+  --main-font: 'Outfit', sans-serif;
+
+  /* Magical Mystic Palette */
+  --magic-deep: #2e1065;
+  --magic-light: #f3e8ff;
+  --magic-gold: #fbbf24;
+  --magic-accent: #c084fc;
+  --text-dark: #4c1d95;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--magic-light);
+  font-family: var(--main-font);
+  font-size: var(--base-size);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+/* Dyslexic Mode */
+.dyslexic-mode,
+.dyslexic-mode * {
+  font-family: 'OpenDyslexic', sans-serif !important;
+  letter-spacing: 0.08em !important;
+  word-spacing: 0.2em !important;
+  line-height: 1.7 !important;
+}
+
+/* Magical Gradient Background */
+/* Magical Background with User Image */
+.ocean-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background: url('/bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
+}
+
+/* Overlay for text readability */
+.ocean-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(243, 232, 255, 0.2) 0%, rgba(46, 16, 101, 0.4) 100%);
+  backdrop-filter: blur(2px);
+}
+
+.magic-dust {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.3;
+  animation: twinkle 4s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: translateY(-20px);
+  }
+}
+
+/* Glass & Gold Cards */
+/* Glass & Gold Cards with Fun Transitions */
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(46, 16, 101, 0.15);
+  border-radius: 2.5rem;
+  color: var(--text-dark);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(16px);
+}
+
+.glass-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--magic-gold);
+  box-shadow: 0 20px 50px rgba(251, 191, 36, 0.3);
+}
+
+.ocean-button {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  color: white;
+  padding: 0.8rem 1.8rem;
+  border-radius: 2rem;
+  font-weight: 800;
+  border: 4px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+}
+
+.ocean-button:hover {
+  transform: translateY(-4px) scale(1.05);
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
+  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5);
+  border-color: white;
+}
+
+.ocean-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.ocean-button:hover::after {
+  left: 100%;
+}
+
+/* Stardust/Sparkles instead of Bubbles */
+@keyframes floatDust {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.8;
+  }
+
+  75% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(20px, -100px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.bubble {
+  position: fixed;
+  background: white;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24;
+  animation: floatDust linear infinite;
+}
+
+/* Rocket/Celebration Styles */
+.celebration-blast {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #fbbf24 0%, transparent 60%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1000;
+  animation: blast 0.8s ease-out forwards;
+}
+
+@keyframes blast {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--magic-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8b4fe;
+  border-radius: 5px;
+}

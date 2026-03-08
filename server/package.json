@@ -1,0 +1,25 @@
+{
+    "name": "dyslexia-server",
+    "version": "1.0.0",
+    "description": "Backend for Dyslexic Friendly Agent",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@google/generative-ai": "^0.24.1",
+        "body-parser": "^2.2.2",
+        "cors": "^2.8.6",
+        "dotenv": "^16.6.1",
+        "express": "^4.22.1",
+        "node-fetch": "^2.7.0",
+        "openai": "^4.24.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.2"
+    }
+}
