@@ -1,17 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('./db');
 const app = express();
 const port = 3005;
 
 app.use(cors());
 app.use(express.json());
-
-// Initialize Gemini
-const apiKey = process.env.GEMINI_API_KEY || "YOUR_API_KEY_HERE";
-const genAI = new GoogleGenerativeAI(apiKey);
 
 app.get('/', (req, res) => {
     res.send('NEMO Agentic AI API is running');
@@ -26,6 +21,16 @@ app.get('/api/user-status', (req, res) => {
     res.json({ ...profile, plans });
 });
 
+// Check if Ollama is running locally
+const checkOllama = async () => {
+    try {
+        const res = await fetch('http://localhost:11434/api/tags');
+        return res.ok;
+    } catch (e) {
+        return false;
+    }
+};
+
 // Generate Daily Plan Endpoint
 app.post('/api/generate-plan', async (req, res) => {
     const { user, age } = req.body;
@@ -33,8 +38,6 @@ app.post('/api/generate-plan', async (req, res) => {
     const logs = db.getLogs(user);
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const dateStr = tomorrow.toLocaleDateString('en-GB');
@@ -51,8 +54,26 @@ app.post('/api/generate-plan', async (req, res) => {
         4. Keep it under 10 words.
         Example: "Learn about the number 5" or "Practice the letter B".`;
 
-        const result = await model.generateContent(prompt);
-        const planText = result.response.text().trim();
+        let planText = "Keep learning and practicing! ✨";
+
+        const isOfflineAvailable = await checkOllama();
+        if (isOfflineAvailable) {
+            try {
+                const response = await fetch('http://localhost:11434/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: "llama3", // or mistral
+                        prompt: prompt,
+                        stream: false
+                    })
+                });
+                const data = await response.json();
+                if (data.response) planText = data.response.trim();
+            } catch (e) {
+                console.error("Ollama Error generating plan:", e.message);
+            }
+        }
 
         db.savePlan(user, dateStr, planText);
         db.updateProgress(user, { dailyGoal: planText });
@@ -78,16 +99,6 @@ app.get('/api/history', (req, res) => {
     res.json(history);
 });
 
-// Check if Ollama is running locally
-const checkOllama = async () => {
-    try {
-        const res = await fetch('http://localhost:11434/api/tags');
-        return res.ok;
-    } catch (e) {
-        return false;
-    }
-};
-
 // Chat Endpoint
 app.post('/api/chat', async (req, res) => {
     const { text, age, user } = req.body;
@@ -98,14 +109,33 @@ app.post('/api/chat', async (req, res) => {
 
     let successfulResponse = null;
 
-    // 1. Try Gemini First (Cloud)
-    if (process.env.GEMINI_API_KEY) {
-        const modelsToTry = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"];
-        for (const modelName of modelsToTry) {
+    // 1. Try TinyLLM for 8-12 Age Group
+    if (age >= 8 && age <= 12) {
+        console.log("Routing to Local TinyLLM for 8-12 age group...");
+        try {
+            const response = await fetch('http://localhost:8000/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: text })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                successfulResponse = data.answer;
+                console.log("Emotion Detected by TinyLLM:", data.emotion);
+            }
+        } catch (error) {
+            console.error("TinyLLM API Error:", error.message);
+        }
+    }
+
+    // 2. Try Ollama (Offline / Local) for 4-7 or if TinyLLM is down
+    if (!successfulResponse) {
+        const isOfflineAvailable = await checkOllama();
+        if (isOfflineAvailable) {
+            console.log("Switching to Offline/Local Model (Ollama)...");
             try {
-                const model = genAI.getGenerativeModel({ model: modelName });
-                const prompt = `
-                You are a warm, caring Indian mother figure (Motherly, Kind, Encouraging) teaching a child who has dyslexia.
+                const prompt = `You are a warm, caring Indian mother figure (Motherly, Kind, Encouraging) teaching a child who has dyslexia.
                 
                 Persona:
                 - Use simple, easy-to-read English.
@@ -119,29 +149,14 @@ app.post('/api/chat', async (req, res) => {
                 Lesson: ${profile.dailyGoal || "None"}
                 User asks: "${text}"
                 
-                Respond kindly.
-                `;
-                const result = await model.generateContent(prompt);
-                successfulResponse = result.response.text();
-                break;
-            } catch (error) {
-                console.error(`Gemini Error (${modelName}):`, error.message);
-            }
-        }
-    }
+                Respond kindly.`;
 
-    // 2. Try Ollama (Offline / Local)
-    if (!successfulResponse) {
-        const isOfflineAvailable = await checkOllama();
-        if (isOfflineAvailable) {
-            console.log("Switching to Offline/Local Model (Ollama)...");
-            try {
                 const response = await fetch('http://localhost:11434/api/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: "llama3", // or mistral, user needs to pull this
-                        prompt: `You are a warm Indian mother figure helping a dyslexic child. User: ${text}. Keep it short and kind.`,
+                        model: "llama3", // or mistral
+                        prompt: prompt,
                         stream: false
                     })
                 });
@@ -158,7 +173,7 @@ app.post('/api/chat', async (req, res) => {
         return res.json({ message: successfulResponse });
     }
 
-    res.json({ message: "Hello beta! I am having trouble connecting to my magic cloud. Please check if you are online or if my localized magic (Ollama) is running! 🙏" });
+    res.json({ message: "Hello beta! I am having trouble connecting to my magic brain. Please check if my localized magic (Ollama/TinyLLM) is running! 🙏" });
 });
 
 app.listen(port, () => {
