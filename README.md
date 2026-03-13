@@ -177,16 +177,7 @@ Capabilities include:
 ```
 
 Node.js >= 18
-npm
-
-```
-
-### Python
-
-```
-
-Python >= 3.9
-pip
+npm install
 
 ```
 
