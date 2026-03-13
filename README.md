@@ -327,49 +327,14 @@ POST /chat
 
 ```
 
----
-
-# 🖼 Screenshots
-
-Add screenshots inside:
-
-```
-
-docs/images/
-
-```
-
-Example:
-
-```
-
-![Chatbot](docs/images/chatbot.png)
-![Learning Page](docs/images/learning.png)
-![Parent Test](docs/images/test.png)
-
-```
-
----
-
-# 📊 GitHub Stats
-
-<p align="center">
-
-<img src="https://github-readme-stats.vercel.app/api?username=ArunimaBanerjee88&show_icons=true&theme=tokyonight"/>
-
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=ArunimaBanerjee88&layout=compact&theme=tokyonight"/>
-
-</p>
-
----
-
 # 🔮 Future Improvements
 
 Potential future enhancements include:
 
 - speech-to-text learning
+- MultiLingual 
 - pronunciation feedback
-- advanced personalization
+- advanced personalisation
 - adaptive difficulty detection
 - larger transformer-based models
 
@@ -388,8 +353,3 @@ https://github.com/ArunimaBanerjee88
 
 This project is developed for **educational and research purposes**.
 
-
-
----
-
-If you want, I can also show you **how to add animated architecture diagrams and GIF demos to this README so it looks like a top-tier GitHub AI project.**
