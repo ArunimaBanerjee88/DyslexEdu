@@ -601,6 +601,41 @@
       "message": "why is reading sometimes slow for me?\n",
       "response": "Many letters share similar shapes, which can cause confusion at first.",
       "timestamp": "2026-03-13T12:33:38.545Z"
+    },
+    {
+      "id": 1773405851752,
+      "user": "Arunima",
+      "message": "Provide a detailed explanation with examples. Answer in short simple sentences. Limit to 10-15 words. \nwhy is reading sometimes slow for me?",
+      "response": "Many letters share similar shapes, which can cause confusion at first.",
+      "timestamp": "2026-03-13T12:44:11.752Z"
+    },
+    {
+      "id": 1773405862682,
+      "user": "Arunima",
+      "message": "Provide a detailed explanation with examples. Answer in short simple sentences. Limit to 10-15 words. what is dyslexia?\n",
+      "response": "The brain may mix up letter order when processing text quickly.",
+      "timestamp": "2026-03-13T12:44:22.682Z"
+    },
+    {
+      "id": 1773405874502,
+      "user": "Arunima",
+      "message": "Provide a detailed explanation with examples. Answer in short simple sentences. Limit to 10-15 words. \nwhat does phonics teach?",
+      "response": "letter sound relationships  What does phonics teach?",
+      "timestamp": "2026-03-13T12:44:34.502Z"
+    },
+    {
+      "id": 1773405883882,
+      "user": "Arunima",
+      "message": "Provide a detailed explanation with examples. Answer in short simple sentences. Limit to 10-15 words. \nwhy are colored overlays used?",
+      "response": "letter sound relationships  What does phonics teach?",
+      "timestamp": "2026-03-13T12:44:43.882Z"
+    },
+    {
+      "id": 1773405920738,
+      "user": "Arunima",
+      "message": "Give a very simple explanation. Provide an in-depth explanation. why does reading get easier with time?\n",
+      "response": "Many letters share similar shapes, which can cause confusion at first.",
+      "timestamp": "2026-03-13T12:45:20.738Z"
     }
   ],
   "users": {
@@ -715,6 +750,14 @@
       "dailyGoal": "Welcome to NEMO! Let's start with ABCs.",
       "streak": 0,
       "lastActivity": "2026-02-27T05:02:40.477Z"
+    },
+    "Arun": {
+      "name": "Arun",
+      "completedLessons": [],
+      "lastStage": "alphabet",
+      "dailyGoal": "Welcome to NEMO! Let's start with ABCs.",
+      "streak": 0,
+      "lastActivity": "2026-03-13T12:45:44.061Z"
     }
   },
   "logs": [

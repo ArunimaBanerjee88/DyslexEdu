@@ -4,6 +4,8 @@ import { ALPHABET_DATA, NUMBERS_DATA, TABLES_DATA, DOMESTIC_ANIMALS_DATA, WILD_A
 import TracingCanvas from './TracingCanvas';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import ParentAssistedTest from './ParentAssistedTest';
+
 const CATEGORIES = [
     { id: 'alphabet', label: 'ABC Phonics', emoji: '🅰️', color: 'bg-white', accent: 'text-rose-500', data: ALPHABET_DATA },
     { id: 'numbers', label: 'Numbers', emoji: '🔢', color: 'bg-white', accent: 'text-blue-500', data: NUMBERS_DATA },
@@ -15,6 +17,7 @@ const CATEGORIES = [
 
 const Flashcards = (props) => {
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [showTest, setShowTest] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [completed, setCompleted] = useState(false);
     const [showTracing, setShowTracing] = useState(false);
@@ -101,6 +104,10 @@ const Flashcards = (props) => {
         }
     };
 
+    if (showTest) {
+        return <ParentAssistedTest onClose={() => setShowTest(false)} />;
+    }
+
     if (!selectedCategory) {
         return (
             <div className="animate-fadeIn p-2 w-full max-w-5xl mx-auto">
@@ -113,6 +120,26 @@ const Flashcards = (props) => {
                         <p className="text-purple-400 text-xs font-bold uppercase tracking-widest mt-1">What magic shall we learn?</p>
                     </div>
                 </div>
+
+                {/* Special Test Button */}
+                <div className="mb-8">
+                    <button
+                        onClick={() => setShowTest(true)}
+                        className="w-full bg-gradient-to-r from-purple-100 to-indigo-50 p-8 rounded-[3rem] border-4 border-white shadow-xl flex items-center justify-between group hover:scale-[1.02] transition-all"
+                    >
+                        <div className="flex items-center gap-6">
+                            <div className="bg-white p-5 rounded-3xl shadow-lg border-2 border-purple-100 group-hover:rotate-12 transition-transform">
+                                <Trophy size={48} className="text-yellow-500" />
+                            </div>
+                            <div className="text-left">
+                                <h3 className="text-3xl font-black text-purple-900 tracking-tight">Parent Assistive Test</h3>
+                                <p className="text-purple-400 font-bold uppercase tracking-[0.2em] text-xs mt-1">Check how much they learned!</p>
+                            </div>
+                        </div>
+                        <ArrowRightCircle size={40} className="text-purple-300 group-hover:text-purple-600 transition-colors" />
+                    </button>
+                </div>
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                     {CATEGORIES.map((cat) => (
                         <button

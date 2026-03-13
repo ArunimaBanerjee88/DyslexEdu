@@ -97,14 +97,23 @@ const InteractiveMessage = ({ text, sender }) => {
     );
 };
 
-const SummaryChat = ({ onFinish }) => {
+const SummaryChat = ({ onFinish, explanationStyle, comfortMode }) => {
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [topicMemory, setTopicMemory] = useState({});
+    const [interactionCount, setInteractionCount] = useState(0);
+    const [suggestion, setSuggestion] = useState(null);
     const chatContainerRef = useRef(null);
 
     const user = localStorage.getItem('dyslexia-agent-name') || 'student';
     const age = localStorage.getItem('dyslexia-agent-age') || 12;
+
+    const topics = {
+        phonics: ['phonics', 'sound', 'letters', 'pronounce'],
+        spelling: ['spell', 'spelling', 'write', 'writing', 'alphabet'],
+        reading: ['read', 'reading', 'book', 'story']
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -163,6 +172,7 @@ const SummaryChat = ({ onFinish }) => {
             sender: 'agent',
             text: `Hi ${user}! I'm NEMO. I'm here to help you read and learn! What's on your mind today?`
         }]);
+        setSuggestion(null);
     };
 
     const handleSend = async () => {
@@ -172,7 +182,21 @@ const SummaryChat = ({ onFinish }) => {
         setMessages(prev => [...prev, userMsg]);
         const currentInput = input;
         setInput('');
-        
+        setInteractionCount(prev => prev + 1);
+
+        // Topic Tracking
+        Object.keys(topics).forEach(topic => {
+            if (topics[topic].some(keyword => currentInput.toLowerCase().includes(keyword))) {
+                setTopicMemory(prev => {
+                    const newCount = (prev[topic] || 0) + 1;
+                    if (newCount >= 3) {
+                        setSuggestion(`You seem interested in ${topic}. Would you like a short practice activity?`);
+                    }
+                    return { ...prev, [topic]: newCount };
+                });
+            }
+        });
+
         // Greeting Detection & Thank You Detection (Local)
         const greetingRegex = /\b(hello|hi|hey)\b/i;
         const thanksRegex = /\b(thank you|thanks)\b/i;
@@ -189,13 +213,47 @@ const SummaryChat = ({ onFinish }) => {
             return;
         }
 
+        // Encouragement Layer
+        if (interactionCount > 0 && interactionCount % 4 === 0) {
+            const encouragements = [
+                "Great job practicing today! ✨",
+                "Learning step by step helps your brain grow stronger. 🧠",
+                "You're doing amazing! Keep going. 🌈"
+            ];
+            const msg = encouragements[Math.floor(Math.random() * encouragements.length)];
+            setTimeout(() => {
+                setMessages(prev => [...prev, { id: Date.now() + 5, sender: 'agent', text: msg }]);
+            }, 2000);
+        }
+
+        // Prompt Personalization
+        let modifiedPrompt = currentInput;
+
+        // Confidence Support
+        const frustrationRegex = /\b(bad at|can't understand|hard|difficult|struggling)\b/i;
+        if (frustrationRegex.test(currentInput)) {
+            modifiedPrompt = `Respond with encouragement and explain the concept gently for a student who feels frustrated: ${modifiedPrompt}`;
+        } else {
+            // explanation style & comfort mode
+            let styleContext = "";
+            if (explanationStyle === 'simple') styleContext = "Give a very simple explanation. ";
+            if (explanationStyle === 'detailed') styleContext = "Provide a detailed explanation with examples. ";
+
+            let sizeContext = "";
+            if (comfortMode === 'focus') sizeContext = "Answer in short simple sentences. Limit to 10-15 words. ";
+            if (comfortMode === 'learning') sizeContext = "Provide a normal size answer. ";
+            if (comfortMode === 'deep') sizeContext = "Provide an in-depth explanation. ";
+
+            modifiedPrompt = `${styleContext}${sizeContext}${modifiedPrompt}`;
+        }
+
         setLoading(true);
 
         try {
             const response = await fetch('http://localhost:3005/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: currentInput, age, user })
+                body: JSON.stringify({ text: modifiedPrompt, age, user })
             });
 
             const data = await response.json();
@@ -257,6 +315,23 @@ const SummaryChat = ({ onFinish }) => {
                     )}
                     <div ref={chatContainerRef} />
                 </div>
+
+                <AnimatePresence>
+                    {suggestion && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="bg-yellow-100 border-2 border-yellow-400 p-4 rounded-2xl mb-4 flex items-center justify-between shadow-md"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Sparkles className="text-yellow-600" />
+                                <span className="text-sm font-bold text-yellow-900">{suggestion}</span>
+                            </div>
+                            <button onClick={() => setSuggestion(null)} className="text-yellow-600 font-black hover:scale-110 transition-transform">×</button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <div className="mt-4 flex gap-4">
                     <textarea

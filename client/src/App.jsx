@@ -14,7 +14,9 @@ function App() {
     const [fontSize, setFontSize] = useState(parseInt(localStorage.getItem('nemo-font-size')) || 16);
     const [useDyslexicFont, setUseDyslexicFont] = useState(localStorage.getItem('nemo-dyslexic-mode') === 'true');
 
-    // Planning State
+    // Personalization State
+    const [explanationStyle, setExplanationStyle] = useState(localStorage.getItem('nemo-explanation-style') || 'simple');
+    const [comfortMode, setComfortMode] = useState(localStorage.getItem('nemo-comfort-mode') || 'learning');
     const [plans, setPlans] = useState([]);
 
     useEffect(() => {
@@ -55,6 +57,16 @@ function App() {
     const changeFontSize = (size) => {
         setFontSize(size);
         localStorage.setItem('nemo-font-size', size);
+    };
+
+    const updateExplanationStyle = (style) => {
+        setExplanationStyle(style);
+        localStorage.setItem('nemo-explanation-style', style);
+    };
+
+    const updateComfortMode = (mode) => {
+        setComfortMode(mode);
+        localStorage.setItem('nemo-comfort-mode', mode);
     };
 
     const resetProgress = () => {
@@ -130,7 +142,7 @@ function App() {
             {/* Settings Overlay */}
             {showSettings && (
                 <div className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-xl flex items-center justify-center p-6" onClick={() => setShowSettings(false)}>
-                    <div className="glass-card p-12 max-w-lg w-full relative shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-white border-t-[12px] border-cyan-500" onClick={e => e.stopPropagation()}>
+                    <div className="glass-card p-12 max-w-lg w-full relative shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-white border-t-[12px] border-cyan-500 overflow-y-auto max-h-[90vh]" onClick={e => e.stopPropagation()}>
                         <button onClick={() => setShowSettings(false)} className="absolute top-8 right-8 text-slate-400 hover:text-slate-600 transition-colors">
                             <X size={40} />
                         </button>
@@ -151,8 +163,8 @@ function App() {
 
                             <div className="flex items-center justify-between p-8 bg-slate-50 rounded-[2.5rem] border-4 border-slate-100">
                                 <div>
-                                    <span className="font-black text-slate-800 text-xl block">Reading Font</span>
-                                    <span className="text-sm text-slate-400 font-bold italic">Special font for dyslexia</span>
+                                    <span className="font-black text-slate-800 text-xl block">Dyslexia Friendly Mode</span>
+                                    <span className="text-sm text-slate-400 font-bold italic">Better spacing & contrast</span>
                                 </div>
                                 <button
                                     onClick={toggleDyslexic}
@@ -160,6 +172,41 @@ function App() {
                                 >
                                     <div className={`absolute top-1 w-7 h-7 bg-white rounded-full transition-all shadow-xl ${useDyslexicFont ? 'left-9' : 'left-1'}`} />
                                 </button>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Explanation Style</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {['simple', 'detailed'].map(style => (
+                                        <button
+                                            key={style}
+                                            onClick={() => updateExplanationStyle(style)}
+                                            className={`p-4 rounded-3xl font-black uppercase tracking-widest text-xs transition-all border-4 ${explanationStyle === style ? 'bg-cyan-600 text-white border-cyan-700' : 'bg-slate-100 text-slate-400 border-slate-200'}`}
+                                        >
+                                            {style}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Reading Comfort Mode</label>
+                                <div className="space-y-4">
+                                    {[
+                                        { id: 'focus', label: 'Fixed Mode (Very Short)' },
+                                        { id: 'learning', label: 'Learning Mode (Normal)' },
+                                        { id: 'deep', label: 'Deep Learning (Detailed)' }
+                                    ].map(mode => (
+                                        <button
+                                            key={mode.id}
+                                            onClick={() => updateComfortMode(mode.id)}
+                                            className={`w-full p-4 rounded-3xl font-black text-left flex items-center justify-between transition-all border-4 ${comfortMode === mode.id ? 'bg-indigo-600 text-white border-indigo-700 shadow-lg scale-[1.02]' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
+                                        >
+                                            <span>{mode.label}</span>
+                                            {comfortMode === mode.id && <Sparkles size={16} />}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -179,7 +226,11 @@ function App() {
                             <div className="p-8 md:p-12">
                                 {age < 7
                                     ? <Flashcards onFinish={refreshPlans} />
-                                    : <SummaryChat onFinish={refreshPlans} />}
+                                    : <SummaryChat 
+                                        onFinish={refreshPlans} 
+                                        explanationStyle={explanationStyle}
+                                        comfortMode={comfortMode}
+                                    />}
                             </div>
                         )}
                     </section>

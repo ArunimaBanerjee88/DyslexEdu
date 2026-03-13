@@ -36,13 +36,19 @@ body {
   overflow-x: hidden;
 }
 
-/* Dyslexic Mode */
+/* Dyslexic Mode (Enhanced Readability) */
 .dyslexic-mode,
 .dyslexic-mode * {
   font-family: 'OpenDyslexic', sans-serif !important;
-  letter-spacing: 0.08em !important;
-  word-spacing: 0.2em !important;
-  line-height: 1.7 !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.15em !important;
+  line-height: 1.8 !important;
+  font-weight: 500 !important;
+}
+
+.dyslexic-mode .glass-card {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-width: 4px !important;
 }
 
 /* Magical Gradient Background */
