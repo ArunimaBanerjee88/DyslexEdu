@@ -112,13 +112,26 @@ const SummaryChat = ({ onFinish }) => {
                 const res = await fetch(`http://localhost:3005/api/history?user=${user}`);
                 const history = await res.json();
 
+                // Clear History Fix: Filter history based on local clear timestamp
+                const clearTimestamp = parseInt(localStorage.getItem(`nemo-clear-ts-${user}`) || '0');
+
                 if (history && history.length > 0) {
-                    const formatted = [];
-                    history.forEach(h => {
-                        formatted.push({ id: h.id + '_q', sender: 'user', text: h.message });
-                        formatted.push({ id: h.id + '_a', sender: 'agent', text: h.response });
-                    });
-                    setMessages(formatted);
+                    const filtered = history.filter(h => h.id > clearTimestamp);
+                    
+                    if (filtered.length > 0) {
+                        const formatted = [];
+                        filtered.forEach(h => {
+                            formatted.push({ id: h.id + '_q', sender: 'user', text: h.message });
+                            formatted.push({ id: h.id + '_a', sender: 'agent', text: h.response });
+                        });
+                        setMessages(formatted);
+                    } else {
+                        setMessages([{
+                            id: 'init',
+                            sender: 'agent',
+                            text: `Hi ${user}! I'm NEMO. I'm here to help you read and learn! What's on your mind today?`
+                        }]);
+                    }
                 } else {
                     setMessages([{
                         id: 'init',
@@ -142,19 +155,47 @@ const SummaryChat = ({ onFinish }) => {
         }
     }, [messages, loading]);
 
+    const handleClearHistory = () => {
+        // Clear locally stored messages and set a new baseline timestamp
+        localStorage.setItem(`nemo-clear-ts-${user}`, Date.now().toString());
+        setMessages([{
+            id: 'init',
+            sender: 'agent',
+            text: `Hi ${user}! I'm NEMO. I'm here to help you read and learn! What's on your mind today?`
+        }]);
+    };
+
     const handleSend = async () => {
         if (!input.trim() || loading) return;
 
         const userMsg = { id: Date.now(), sender: 'user', text: input };
         setMessages(prev => [...prev, userMsg]);
+        const currentInput = input;
         setInput('');
+        
+        // Greeting Detection & Thank You Detection (Local)
+        const greetingRegex = /\b(hello|hi|hey)\b/i;
+        const thanksRegex = /\b(thank you|thanks)\b/i;
+
+        if (greetingRegex.test(currentInput)) {
+            const agentMsg = { id: Date.now() + 1, sender: 'agent', text: "Hello! I'm happy to see you. How can I help you learn today?" };
+            setTimeout(() => setMessages(prev => [...prev, agentMsg]), 500);
+            return;
+        }
+
+        if (thanksRegex.test(currentInput)) {
+            const agentMsg = { id: Date.now() + 1, sender: 'agent', text: "You're welcome! See you next time for more lessons." };
+            setTimeout(() => setMessages(prev => [...prev, agentMsg]), 500);
+            return;
+        }
+
         setLoading(true);
 
         try {
             const response = await fetch('http://localhost:3005/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: input, age, user })
+                body: JSON.stringify({ text: currentInput, age, user })
             });
 
             const data = await response.json();
@@ -242,7 +283,7 @@ const SummaryChat = ({ onFinish }) => {
 
             <div className="flex justify-center">
                 <button
-                    onClick={onFinish}
+                    onClick={handleClearHistory}
                     className="flex items-center gap-2 text-purple-400 font-bold uppercase tracking-widest text-xs hover:text-purple-700 transition-colors bg-white/50 px-4 py-2 rounded-full"
                 >
                     <RefreshCw size={14} /> Clear History
