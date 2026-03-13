@@ -18,6 +18,7 @@ function App() {
     const [explanationStyle, setExplanationStyle] = useState(localStorage.getItem('nemo-explanation-style') || 'simple');
     const [comfortMode, setComfortMode] = useState(localStorage.getItem('nemo-comfort-mode') || 'learning');
     const [plans, setPlans] = useState([]);
+    const [planDismissed, setPlanDismissed] = useState(false);
 
     useEffect(() => {
         const savedAge = localStorage.getItem('dyslexia-agent-age');
@@ -237,9 +238,16 @@ function App() {
                 </div>
 
                 {/* Plan Notification */}
-                {age && latestPlan && (
+                {age && latestPlan && !planDismissed && (
                     <div className="fixed bottom-10 right-10 z-[60] w-96 animate-fadeInRight group">
-                        <div className="bg-white rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.3)] border-[6px] border-cyan-100 p-10 transform group-hover:-translate-y-4 transition-all duration-500 cursor-pointer">
+                        <div className="bg-white rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.3)] border-[6px] border-cyan-100 p-10 transform group-hover:-translate-y-4 transition-all duration-500 relative">
+                            <button 
+                                onClick={() => setPlanDismissed(true)}
+                                className="absolute top-6 right-6 p-2 text-slate-300 hover:text-slate-500 transition-colors rounded-full hover:bg-slate-50"
+                                title="Dismiss"
+                            >
+                                <X size={24} />
+                            </button>
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3 bg-cyan-50 px-4 py-2 rounded-2xl">
                                     <Calendar className="text-cyan-600" size={24} />

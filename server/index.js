@@ -33,14 +33,24 @@ app.post('/api/generate-plan', async (req, res) => {
         tomorrow.setDate(tomorrow.getDate() + 1);
         const dateStr = tomorrow.toLocaleDateString('en-GB');
 
-        const prompt = `Give one simple lesson for tomorrow (${dateStr}) for student ${user} (Age: ${age}). Under 10 words.`;
-
+        // Logic: If last lesson was ABC Phonics, set next goal to Numbers 1-100
+        const isPhonicsDone = logs.some(l => l.lesson === 'ABC Phonics');
+        
         let planText = "Keep learning and practicing! ✨";
 
-        // Use TinyLLM for plan generation if possible
-        const response = await getTinyLLMResponse(prompt);
-        if (response && response.answer) {
-            planText = response.answer;
+        if (isPhonicsDone) {
+            planText = "Master numbers 1-100! 🔢";
+        } else {
+            const prompt = `Give one simple lesson for tomorrow (${dateStr}) for student ${user} (Age: ${age}). Under 10 words.`;
+            const response = await getTinyLLMResponse(prompt);
+            
+            if (response && response.answer) {
+                // Sanitize LLM junk (nan, etc)
+                const sanitized = response.answer.replace(/\b(nan)\b/ig, '').trim();
+                if (sanitized && sanitized.length > 5) {
+                    planText = sanitized;
+                }
+            }
         }
 
         db.savePlan(user, dateStr, planText);
