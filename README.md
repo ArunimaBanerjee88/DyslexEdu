@@ -177,7 +177,7 @@ Capabilities include:
 ```
 
 Node.js >= 18
-npm install
+npm 
 
 ```
 
