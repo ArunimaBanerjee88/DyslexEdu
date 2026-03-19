@@ -14,9 +14,9 @@ function App() {
     const [fontSize, setFontSize] = useState(parseInt(localStorage.getItem('nemo-font-size')) || 16);
     const [useDyslexicFont, setUseDyslexicFont] = useState(localStorage.getItem('nemo-dyslexic-mode') === 'true');
 
-    // Personalization State
     const [explanationStyle, setExplanationStyle] = useState(localStorage.getItem('nemo-explanation-style') || 'simple');
     const [comfortMode, setComfortMode] = useState(localStorage.getItem('nemo-comfort-mode') || 'learning');
+    const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('nemo-language') || 'en');
     const [plans, setPlans] = useState([]);
     const [planDismissed, setPlanDismissed] = useState(false);
 
@@ -73,8 +73,26 @@ function App() {
     const resetProgress = () => {
         if (confirm("Reset NEMO's memory and restart?")) {
             localStorage.clear();
+            // Also clear translation cookie
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             window.location.reload();
         }
+    };
+
+    const changeLanguage = (langCode) => {
+        setSelectedLanguage(langCode);
+        localStorage.setItem('nemo-language', langCode);
+        
+        if (langCode === 'en') {
+            // Clear the google translate cookie to revert to original
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;';
+        } else {
+            // Set the google translate cookie
+            document.cookie = `googtrans=/en/${langCode}; path=/;`;
+        }
+        
+        window.location.reload();
     };
 
     const MagicDust = () => {
@@ -208,6 +226,29 @@ function App() {
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div className="pt-6 border-t-[4px] border-slate-100">
+                                <label className="block text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-4">NeMo Language Settings</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[
+                                        { code: 'en', label: 'English' },
+                                        { code: 'hi', label: 'Hindi' },
+                                        { code: 'bn', label: 'Bengali' },
+                                        { code: 'kn', label: 'Kannada' },
+                                        { code: 'ta', label: 'Tamil' },
+                                        { code: 'ml', label: 'Malayalam' }
+                                    ].map(lang => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => changeLanguage(lang.code)}
+                                            className={`p-4 rounded-3xl font-black uppercase tracking-widest text-xs transition-all border-4 ${selectedLanguage === lang.code ? 'bg-amber-500 text-white border-amber-600 shadow-lg scale-[1.02]' : 'bg-slate-50 text-slate-400 border-slate-100 hover:border-amber-200'}`}
+                                        >
+                                            {lang.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-slate-400 font-bold italic mt-4 text-center">Changing language will reload the learning adventure!</p>
                             </div>
                         </div>
                     </div>

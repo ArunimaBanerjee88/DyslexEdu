@@ -825,6 +825,41 @@
       "message": "Give a very simple explanation. Provide a normal size answer. \nhow can i remember spelling better?",
       "response": "Reading aloud connects written words with sounds.",
       "timestamp": "2026-03-13T15:02:52.560Z"
+    },
+    {
+      "id": 1773465305811,
+      "user": "Arunima",
+      "message": "Give a very simple explanation. Provide a normal size answer. What is dyslexia?\n",
+      "response": "The more you read, the more familiar your brain becomes with words.",
+      "timestamp": "2026-03-14T05:15:05.811Z"
+    },
+    {
+      "id": 1773465334543,
+      "user": "Arunima",
+      "message": "Give a very simple explanation. Provide a normal size answer. \nhow can i remember spelling better?",
+      "response": "Reading aloud connects written words with sounds.",
+      "timestamp": "2026-03-14T05:15:34.543Z"
+    },
+    {
+      "id": 1773465345867,
+      "user": "Arunima",
+      "message": "Give a very simple explanation. Provide a normal size answer. \nwhy is reading sometimes slow for me?",
+      "response": "Many letters share similar shapes, which can cause confusion at first.",
+      "timestamp": "2026-03-14T05:15:45.867Z"
+    },
+    {
+      "id": 1773465373665,
+      "user": "Arunima",
+      "message": "Provide a detailed explanation with examples. Answer in short simple sentences. Limit to 10-15 words. why is reading sometimes slow for me?\n",
+      "response": "Many letters share similar shapes, which can cause confusion at first.",
+      "timestamp": "2026-03-14T05:16:13.665Z"
+    },
+    {
+      "id": 1773912946782,
+      "user": "Aru",
+      "message": "Give a very simple explanation. Provide a normal size answer. what is dyslexic",
+      "response": "letter sound relationships  What does phonics teach?",
+      "timestamp": "2026-03-19T09:35:46.782Z"
     }
   ],
   "users": {

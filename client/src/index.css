@@ -218,3 +218,26 @@ body {
   background: #d8b4fe;
   border-radius: 5px;
 }
+
+/* Hide Google Translate Banner and Widget */
+html {
+    top: 0 !important;
+}
+body {
+    top: 0 !important;
+}
+.goog-te-banner-frame {
+    display: none !important;
+    visibility: hidden !important;
+}
+.skiptranslate > iframe.goog-te-banner-frame {
+    display: none !important;
+    visibility: hidden !important;
+}
+#goog-gt-tt, .goog-te-balloon-frame {
+    display: none !important;
+}
+#google_translate_element {
+    display: none !important;
+}
+

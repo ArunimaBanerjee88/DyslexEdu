@@ -5,13 +5,43 @@ import { motion, AnimatePresence } from 'framer-motion';
 const InteractiveMessage = ({ text, sender }) => {
     const [highlightIndex, setHighlightIndex] = useState(-1);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const textRef = useRef(null);
 
     // Split text into words but keep punctuation
     const words = text.split(/(\s+)/);
 
-    const speakWord = (word) => {
+    const speakWord = (textToSpeak) => {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(word);
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        
+        const currentLang = localStorage.getItem('nemo-language') || 'en';
+        const langCode = currentLang === 'en' ? 'en-IN' : `${currentLang}-IN`;
+        utterance.lang = langCode;
+        
+        const voices = window.speechSynthesis.getVoices();
+        
+        // 1. Exact match for Language + India region (en-IN, hi-IN)
+        let preferredVoice = voices.find(v => v.lang.replace('_', '-').toLowerCase() === langCode.toLowerCase());
+        
+        // 2. Match language by name AND has "India" or "IN"
+        if (!preferredVoice) {
+            const nameMap = { 'hi': 'Hindi', 'bn': 'Bengali', 'ta': 'Tamil', 'ml': 'Malayalam', 'kn': 'Kannada', 'en': 'English' };
+            const langName = nameMap[currentLang] || currentLang;
+            preferredVoice = voices.find(v => 
+                (v.lang.toLowerCase().startsWith(currentLang) || v.name.includes(langName)) 
+                && (v.lang.includes('IN') || v.name.includes('India'))
+            );
+        }
+
+        // 3. Fallback to ANY Indian voice to ensure Indian accent
+        if (!preferredVoice) {
+            preferredVoice = voices.find(v => v.lang.includes('IN') || v.name.includes('India'));
+        }
+
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+        }
+        
         window.speechSynthesis.speak(utterance);
     };
 
@@ -24,14 +54,38 @@ const InteractiveMessage = ({ text, sender }) => {
         }
 
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Read the actual translated text from the DOM if available
+        const translatedText = textRef.current ? textRef.current.innerText : text;
+        const utterance = new SpeechSynthesisUtterance(translatedText);
 
-        // Voice selection logic (Indian/Female)
+        const currentLang = localStorage.getItem('nemo-language') || 'en';
+        const langCode = currentLang === 'en' ? 'en-IN' : `${currentLang}-IN`;
+        utterance.lang = langCode;
+
         const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v => v.lang.includes('en-IN') || v.name.includes('India'))
-            || voices.find(v => v.name.includes('Female'))
-            || voices[0];
-        if (preferredVoice) utterance.voice = preferredVoice;
+        
+        // 1. Exact match for Language + India region (en-IN, hi-IN)
+        let preferredVoice = voices.find(v => v.lang.replace('_', '-').toLowerCase() === langCode.toLowerCase());
+        
+        // 2. Match language by name AND has "India" or "IN"
+        if (!preferredVoice) {
+            const nameMap = { 'hi': 'Hindi', 'bn': 'Bengali', 'ta': 'Tamil', 'ml': 'Malayalam', 'kn': 'Kannada', 'en': 'English' };
+            const langName = nameMap[currentLang] || currentLang;
+            preferredVoice = voices.find(v => 
+                (v.lang.toLowerCase().startsWith(currentLang) || v.name.includes(langName)) 
+                && (v.lang.includes('IN') || v.name.includes('India'))
+            );
+        }
+
+        // 3. Fallback to ANY Indian voice to ensure Indian accent
+        if (!preferredVoice) {
+            preferredVoice = voices.find(v => v.lang.includes('IN') || v.name.includes('India'));
+        }
+
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+        }
 
         utterance.rate = 0.9;
         utterance.pitch = 1.0;
@@ -79,11 +133,11 @@ const InteractiveMessage = ({ text, sender }) => {
                 {isSpeaking ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
             </button>
 
-            <p className="leading-relaxed">
+            <p className="leading-relaxed" ref={textRef}>
                 {words.map((word, i) => (
                     <span
                         key={i}
-                        onClick={(e) => { e.stopPropagation(); speakWord(word); }}
+                        onClick={(e) => { e.stopPropagation(); speakWord(e.target.innerText); }}
                         className={`
                             cursor-pointer transition-all duration-200 rounded px-0.5
                             ${i === highlightIndex ? 'bg-yellow-300 text-purple-900 font-bold scale-110 shadow-sm' : 'hover:bg-purple-100 hover:text-purple-700'}
