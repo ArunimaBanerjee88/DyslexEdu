@@ -340,7 +340,7 @@ Potential future enhancements include:
 
 ---
 
-# 👩‍💻 Author
+# Author
 
 **Arunima Banerjee**
 
@@ -349,7 +349,8 @@ https://github.com/ArunimaBanerjee88
 
 ---
 
-# 📄 License
+## License
 
 This project is developed for **educational and research purposes**.
+This project is protected. Unauthorized use, copying, or distribution is prohibited without permission.
 
